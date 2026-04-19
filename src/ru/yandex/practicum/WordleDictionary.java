@@ -15,11 +15,11 @@ public class WordleDictionary {
      */
     private final List<String> words;
 
-    public WordleDictionary () {
+    public WordleDictionary() {
         this.words = new ArrayList<>();
     }
 
-    public WordleDictionary (List<String> array) {
+    public WordleDictionary(List<String> array) {
         this.words = new ArrayList<>(array);
     }
 
@@ -30,32 +30,32 @@ public class WordleDictionary {
     /** Метод добавляет слова в словарь
      * @param word слово для добавления
      */
-    public void add (String word) {
+    public void add(String word) {
         words.add(normalize(word));
     }
 
     /** Метод удаляет слово из словаря
      * @param word слово для удаления
      */
-    public void remove (String word) {
+    public void remove(String word) {
         words.remove(word);
     }
 
     /** Метод проверяет словарь на пустоту
      */
-    public boolean isEmpty () {
+    public boolean isEmpty() {
         return words.isEmpty();
     }
 
     /** Метод проверяет словарь на пустоту
      */
-    public int size () {
+    public int size() {
         return words.size();
     }
 
     /** Метод очищает словарь
      */
-    public void clear () {
+    public void clear() {
         words.clear();
     }
 
@@ -63,7 +63,7 @@ public class WordleDictionary {
      * @param word слово для нормализации
      * @return нормализованное слово
      */
-    public String normalize (String word) {
+    public String normalize(String word) {
         // нужно привести слова к единой форме в нижнем регистре, без пробелов в начале/конце
         // и заменить букву ё на букву е, потому что в игре они равнозначны.
         return word.toLowerCase().trim().replace("ё","e");
@@ -92,6 +92,7 @@ public class WordleDictionary {
         Predicate<String> wordsWithoutChar = str -> !(str.contains(character));
         words.removeIf(wordsWithoutChar);
     }
+
     /** Метод удаляет слова из словаря, где указанная буква на заданной позиции
      * @param character буква которой не должно быть в слове словаря
      */
