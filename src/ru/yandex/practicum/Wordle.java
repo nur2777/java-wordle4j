@@ -11,7 +11,7 @@ public class Wordle {
     /**
      * Имя лог-файла
      */
-    private static final String logFileName = "log.txt";
+    private static final String logFileName = "out/log.txt";
     /**
      * Имя исходного файла со списком слов
      */
