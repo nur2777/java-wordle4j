@@ -58,7 +58,7 @@ public class WordleGame {
         return currentStep;
     }
 
-    public WordleGame (WordleDictionary dictionary, PrintWriter logFile) {
+    public WordleGame(WordleDictionary dictionary, PrintWriter logFile) {
         this.dictionary = dictionary;
         this.logFile = logFile;
         this.currentStep = 1;
@@ -72,7 +72,7 @@ public class WordleGame {
      * @param rightAnswer искуственно правильно заданный ответ
      * @param logFile логфайл
      */
-    protected WordleGame (WordleDictionary dictionary,String rightAnswer, PrintWriter logFile) {
+    protected WordleGame(WordleDictionary dictionary,String rightAnswer, PrintWriter logFile) {
         this.dictionary = dictionary;
         this.logFile = logFile;
         this.currentStep = 6;
