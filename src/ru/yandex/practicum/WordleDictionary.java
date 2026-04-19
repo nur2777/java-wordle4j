@@ -3,6 +3,7 @@ package ru.yandex.practicum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 /**
  * Класс предназначен для хранения списка слов words
@@ -18,6 +19,10 @@ public class WordleDictionary {
         this.words = new ArrayList<>();
     }
 
+    public WordleDictionary (List<String> array) {
+        this.words = new ArrayList<>(array);
+    }
+
     public List<String> getWords() {
         return words;
     }
@@ -31,6 +36,13 @@ public class WordleDictionary {
         words.add(word.toLowerCase().replace("ё","e"));
     }
 
+    /** Метод удаляет слово из словаря
+     * @param word слово для удаления
+     */
+    public void remove (String word) {
+        words.remove(word);
+    }
+
     /** Метод возвращает случайное слово из словаря
      * @return случайное слово
      */
@@ -38,9 +50,35 @@ public class WordleDictionary {
         int randomInt = new Random().nextInt(words.size());
         return words.get(randomInt);
     }
-    /*
-    этот класс содержит в себе список слов List<String>
-    его методы похожи на методы списка, но учитывают особенности игры
-    также этот класс может содержать рутинные функции по сравнению слов, букв и т.д.
- */
+
+    /** Метод удаляет слова из словаря в которых есть указанная буква
+     * @param character буква которой не должно быть в слове
+     */
+    protected void deleteWordWithChar(CharSequence character) {
+        Predicate<String> wordsWithoutChar = str -> str.contains(character);
+        words.removeIf(wordsWithoutChar);
+    }
+
+    /** Метод удаляет слова из словаря в которых нет указанной буквы
+     * @param character буква которая должно быть в слове
+     */
+    protected void deleteWordNotContainsThisChar(CharSequence character) {
+        Predicate<String> wordsWithoutChar = str -> !(str.contains(character));
+        words.removeIf(wordsWithoutChar);
+    }
+    /** Метод удаляет слова из словаря, где указанная буква на заданной позиции
+     * @param character буква которой не должно быть в слове словаря
+     */
+    protected void deleteWordCharOnPosition(char character, int i) {
+        Predicate<String> wordsWithoutChar = str -> (str.charAt(i) == character);
+        words.removeIf(wordsWithoutChar);
+    }
+
+    /** Метод удаляет слова из словаря в которых нет указанной буквы на заданной позиции
+     * @param character буква которой не должно быть в слове словаря
+     */
+    protected void deleteWordCharNotOnPosition(char character, int i) {
+        Predicate<String> wordsWithoutChar = str -> !(str.charAt(i) == character);
+        words.removeIf(wordsWithoutChar);
+    }
 }

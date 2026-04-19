@@ -2,20 +2,7 @@ package ru.yandex.practicum;
 
 import java.io.PrintWriter;
 
-/*
-в этом классе хранится словарь и состояние игры
-    текущий шаг
-    всё что пользователь вводил
-    правильный ответ
-
-в этом классе нужны методы, которые
-    проанализируют совпадение слова с ответом
-    предложат слово-подсказку с учётом всего, что вводил пользователь ранее
-
-не забудьте про специальные типы исключений для игровых и неигровых ошибок
- */
 public class WordleGame {
-
     /**
      * Правильный ответ загаданный в игре
      */
@@ -29,6 +16,10 @@ public class WordleGame {
      */
     private final WordleDictionary dictionary;
     /**
+     * Словарь подсказок
+     */
+    private final WordleDictionary hints;
+    /**
      * Максимальное количество попыток
      */
     private final int maxSteps = 6;
@@ -40,7 +31,6 @@ public class WordleGame {
      * Статус игры
      */
     private WordleGameStatus gameStatus;
-
     /**
      * Лог файл
      */
@@ -54,12 +44,17 @@ public class WordleGame {
         return wordLength;
     }
 
+    public String getRightAnswer() {
+        return rightAnswer;
+    }
+
     public WordleGame (WordleDictionary dictionary, PrintWriter logFile) {
         this.dictionary = dictionary;
         this.logFile = logFile;
         this.currentStep = 1;
         this.rightAnswer = dictionary.getRandomWord();
         this.gameStatus = WordleGameStatus.IN_PROGRESS;
+        this.hints = new WordleDictionary(dictionary.getWords());
     }
 
     public WordleGameStatus getGameStatus() {
@@ -90,20 +85,16 @@ public class WordleGame {
     /** Метод выполняет проверки введенного пользователем слова согласно ТЗ
      *  Проверять длину слова, пустоту и наличие в словаре
      * @param word введенное пользователем слово
-     * @return true - если все проверки успешно пройдены, false - если проверки не пройдены
      */
-    public boolean checkWord(String word) {
-        logFile.println("Введено слово: " + word);
-        if (word.isBlank() || (word.length() != wordLength)) {
-            logFile.println("Слово либо не соответствует длине (" + wordLength + "), либо содержит только пробелы. Проверка не пройдена!");
-            return false;
+    public void checkWord(String word) throws WordleGameExceptions {
+        logFile.println("Проверяется слово: " + word);
+        if (word == null || (word.length() != wordLength)) {
+            throw new WordleGameExceptions("Слово либо не соответствует необходимой длине (" + wordLength + "), либо пусто.",logFile);
         }
         if (!dictionary.getWords().contains(word)) {
-            logFile.println("Данное слово отсутствует в словаре. Проверка не пройдена!");
-            return false;
+            throw new WordleGameExceptions("Данное слово отсутствует в словаре.",logFile);
         }
         logFile.println("Проверки пройдены успешно.");
-        return true;
     }
 
     /** Метод сравнивает посимвольно правильный ответ и ответ пользователя
@@ -112,15 +103,35 @@ public class WordleGame {
      */
     private String getResult(String userAnswer) {
         StringBuilder result = new StringBuilder();
+        logFile.println("words.size = " + dictionary.getWords().size());
+        logFile.println("hints.size = " + hints.getWords().size());
         for (int i = 0; i < rightAnswer.length(); i++) {
+            CharSequence charSequence = String.valueOf(userAnswer.charAt(i));
             if (userAnswer.charAt(i) == rightAnswer.charAt(i)) {
                 result.append("+");
-            } else if (rightAnswer.contains(String.valueOf(userAnswer.charAt(i)))) {
+                // удаляем из словаря подсказок все слова в которых нет указанной буквы на заданной позиции
+                hints.deleteWordCharNotOnPosition(userAnswer.charAt(i),i);
+            } else if (rightAnswer.contains(charSequence)) {
                 result.append("^");
+                // удаляем из словаря подсказок все слова в которых нет указанной буквы
+                hints.deleteWordNotContainsThisChar(charSequence);
+                // удаляем из словаря подсказок все слова, где указанная буква на заданной позиции
+                hints.deleteWordCharOnPosition(userAnswer.charAt(i),i);
             } else {
                 result.append("-");
+                // удаляем из словаря подсказок все слова в которых есть указанная буква
+                hints.deleteWordWithChar(charSequence);
             }
         }
         return result.toString();
+    }
+
+    /** Метод генерирует и выдаёт случайное слово из словаря подсказок
+     * @return слово подсказка
+     */
+    public String getHint() {
+        String hint = hints.getRandomWord();
+        hints.remove(hint); // удаляем слово подсказку из словаря, что бы более не встречалась
+        return hint;
     }
 }
