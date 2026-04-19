@@ -27,7 +27,8 @@ public class Wordle {
             WordleDictionaryLoader dictionaryLoader = new WordleDictionaryLoader(sourceFileName,charset,logFile);
             WordleDictionary dictionary = dictionaryLoader.loadDictionary();
             WordleGame game = new WordleGame(dictionary,logFile);
-            System.out.println("Угадайте загаданное слово из " + WordleGame.getWordLength() +" букв за " + game.getMaxSteps() + " попыток!");
+            System.out.println("Угадайте загаданное слово из " + WordleGame.getWordLength() + " букв за "
+                    + game.getMaxSteps() + " попыток!");
             gameProcess(game,logFile);
         } catch (WordleGameExceptions | IOException e) {
             System.out.println(e.getMessage());
@@ -64,7 +65,8 @@ public class Wordle {
         if (game.getGameStatus() == WordleGameStatus.SUCCESS) {
             System.out.println("Поздравляем! Вы выиграли и угадали слово!");
         } else if (game.getGameStatus() == WordleGameStatus.FAIL) {
-            System.out.println("К сожалению, вы проиграли! Было загадано слово: " + game.getRightAnswer()+ ". Вы можете попробовать ещё раз.");
+            System.out.println("К сожалению, вы проиграли! Было загадано слово: " + game.getRightAnswer()
+                    + ". Вы можете попробовать ещё раз.");
         }
 
     }
