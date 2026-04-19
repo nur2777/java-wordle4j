@@ -31,9 +31,7 @@ public class WordleDictionary {
      * @param word слово для добавления
      */
     public void add (String word) {
-        // нужно привести слова к единой форме в нижнем регистре и заменить букву ё на букву е,
-        // потому что в игре они равнозначны.
-        words.add(word.toLowerCase().replace("ё","e"));
+        words.add(normalize(word));
     }
 
     /** Метод удаляет слово из словаря
@@ -41,6 +39,34 @@ public class WordleDictionary {
      */
     public void remove (String word) {
         words.remove(word);
+    }
+
+    /** Метод проверяет словарь на пустоту
+     */
+    public boolean isEmpty () {
+        return words.isEmpty();
+    }
+
+    /** Метод проверяет словарь на пустоту
+     */
+    public int size () {
+        return words.size();
+    }
+
+    /** Метод очищает словарь
+     */
+    public void clear () {
+        words.clear();
+    }
+
+    /** Метод нормализации слова по правилам игры
+     * @param word слово для нормализации
+     * @return нормализованное слово
+     */
+    public String normalize (String word) {
+        // нужно привести слова к единой форме в нижнем регистре, без пробелов в начале/конце
+        // и заменить букву ё на букву е, потому что в игре они равнозначны.
+        return word.toLowerCase().trim().replace("ё","e");
     }
 
     /** Метод возвращает случайное слово из словаря

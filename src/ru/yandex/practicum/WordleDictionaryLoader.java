@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.Exceptions.WordleGameExceptions;
+
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -32,18 +34,26 @@ public class WordleDictionaryLoader {
     /** Метод считывает данные из исходного файла и заполняет словарь для игры
      * @return заполненный словарь для игры
      */
-    public WordleDictionary loadDictionary() throws IOException {
+    public WordleDictionary loadDictionary() throws IOException, WordleGameExceptions {
         WordleDictionary dictionary = new WordleDictionary();
         logFile.println("Шаг первый - загрузка словаря");
         try (Reader fileReader = new FileReader(sourceFileName,charset)) {
             BufferedReader buffer = new BufferedReader(fileReader);
             while (buffer.ready()) {
                 String word = buffer.readLine();
-                if (word.length() == WordleGame.getWordLength()) dictionary.add(word);
+                if (word.length() == WordleGame.getWordLength()) {
+                    dictionary.add(word);
+                }
             }
-            logFile.println("Загрузка словаря успешно завершена.");
+            if (!dictionary.getWords().isEmpty()) {
+                logFile.println("Загрузка словаря успешно завершена. Загружено " + dictionary.size() + " слов");
+            } else {
+                throw new WordleGameExceptions("Ошибка при загрузке словаря. Словарь пуст, ни одно " +
+                        "слово не загружено.", logFile);
+            }
         } catch (FileNotFoundException e) {
-            logFile.println("Исходный файл " + sourceFileName + " для загрузки не найден.");
+            throw new WordleGameExceptions("Исходный файл словаря " + sourceFileName + " не найден. " +
+                    "Загрузка прервана!", logFile);
         }
         return dictionary;
     }

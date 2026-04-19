@@ -1,5 +1,8 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.Exceptions.*;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -25,8 +28,8 @@ public class Wordle {
             WordleDictionary dictionary = dictionaryLoader.loadDictionary();
             WordleGame game = new WordleGame(dictionary,logFile);
             System.out.println("Угадайте загаданное слово из " + WordleGame.getWordLength() +" букв за " + game.getMaxSteps() + " попыток!");
-            gameProcess(game);
-        } catch (Throwable e) {
+            gameProcess(game,logFile);
+        } catch (WordleGameExceptions | IOException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("Программа завершена. Спасибо за игру!");
@@ -37,21 +40,25 @@ public class Wordle {
     /** Метод в котором реализован процесс игры - основной игровой цикл
      * @param game созданная игра
      */
-    private static void gameProcess(WordleGame game) {
+    private static void gameProcess(WordleGame game,PrintWriter logFile) {
         Scanner scanner = new Scanner(System.in);
         while (game.getGameStatus() == WordleGameStatus.IN_PROGRESS) {
             try {
+                logFile.println("-".repeat(20) + ". Попытка: " + game.getCurrentStep());
                 System.out.println("Попытка № " + game.getCurrentStep() + ". Введите слово и нажмите Enter");
                 String userAnswer = scanner.nextLine().trim();
                 if (userAnswer.isBlank()) { // если просто нажали Enter без ввода слова
+                    logFile.println("Пользователь нажал Enter");
                     userAnswer = game.getHint(); // выдаём подсказку
                     System.out.println(userAnswer);
                 }
                 game.checkWord(userAnswer);
                 String result = game.compareUserAnswer(userAnswer);
+                logFile.println("Строка-подсказка:" + result);
                 System.out.println(result);
-            } catch (WordleGameExceptions exception) {
+            } catch (WordNotFoundInDictionary | WordNullOrIncorrectLength | WordHasNotCirilicChar exception) {
                 System.out.println(exception.getMessage());
+                logFile.println(exception.getMessage());
             }
         }
         if (game.getGameStatus() == WordleGameStatus.SUCCESS) {

@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.Exceptions.*;
+
 import java.io.PrintWriter;
 
 public class WordleGame {
@@ -48,6 +50,14 @@ public class WordleGame {
         return rightAnswer;
     }
 
+    public WordleGameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public int getCurrentStep() {
+        return currentStep;
+    }
+
     public WordleGame (WordleDictionary dictionary, PrintWriter logFile) {
         this.dictionary = dictionary;
         this.logFile = logFile;
@@ -57,12 +67,18 @@ public class WordleGame {
         this.hints = new WordleDictionary(dictionary.getWords());
     }
 
-    public WordleGameStatus getGameStatus() {
-        return gameStatus;
-    }
-
-    public int getCurrentStep() {
-        return currentStep;
+    /** Конструктор для тестирования
+     * @param dictionary словарь
+     * @param rightAnswer искуственно правильно заданный ответ
+     * @param logFile логфайл
+     */
+    protected WordleGame (WordleDictionary dictionary,String rightAnswer, PrintWriter logFile) {
+        this.dictionary = dictionary;
+        this.logFile = logFile;
+        this.currentStep = 6;
+        this.rightAnswer = rightAnswer;
+        this.gameStatus = WordleGameStatus.IN_PROGRESS;
+        this.hints = new WordleDictionary(dictionary.getWords());
     }
 
     /** Метод анализирует ответ пользователя и возвращает результат
@@ -70,29 +86,35 @@ public class WordleGame {
      * @return строку с посимвольным результатом сравнения
      */
     public String compareUserAnswer(String userAnswer) {
-        userAnswer = userAnswer.toLowerCase().replace("ё","e");
+        userAnswer = dictionary.normalize(userAnswer);
         if (rightAnswer.equals(userAnswer)) {
             gameStatus = WordleGameStatus.SUCCESS;
+            logFile.println("Пользователь угадал");
         } else {
             currentStep++;
             if (currentStep > maxSteps) {
                 gameStatus = WordleGameStatus.FAIL;
+                logFile.println("Пользователь проиграл");
             }
         }
         return getResult(userAnswer);
     }
 
     /** Метод выполняет проверки введенного пользователем слова согласно ТЗ
-     *  Проверять длину слова, пустоту и наличие в словаре
+     *  Проверять длину слова, пустоту, наличие английских символов и наличие в словаре
      * @param word введенное пользователем слово
      */
-    public void checkWord(String word) throws WordleGameExceptions {
+    public void checkWord(String word) throws WordNotFoundInDictionary, WordNullOrIncorrectLength, WordHasNotCirilicChar {
         logFile.println("Проверяется слово: " + word);
+        if (!word.matches(".*[а-яА-ЯёЁ].*")) {
+            throw new WordHasNotCirilicChar();
+        }
         if (word == null || (word.length() != wordLength)) {
-            throw new WordleGameExceptions("Слово либо не соответствует необходимой длине (" + wordLength + "), либо пусто.",logFile);
+            throw new WordNullOrIncorrectLength("Слово либо не соответствует необходимой длине (" +
+                    wordLength + "), либо пусто.");
         }
         if (!dictionary.getWords().contains(word)) {
-            throw new WordleGameExceptions("Данное слово отсутствует в словаре.",logFile);
+            throw new WordNotFoundInDictionary();
         }
         logFile.println("Проверки пройдены успешно.");
     }
@@ -103,8 +125,6 @@ public class WordleGame {
      */
     private String getResult(String userAnswer) {
         StringBuilder result = new StringBuilder();
-        logFile.println("words.size = " + dictionary.getWords().size());
-        logFile.println("hints.size = " + hints.getWords().size());
         for (int i = 0; i < rightAnswer.length(); i++) {
             CharSequence charSequence = String.valueOf(userAnswer.charAt(i));
             if (userAnswer.charAt(i) == rightAnswer.charAt(i)) {

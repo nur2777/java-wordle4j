@@ -1,6 +1,8 @@
 package ru.yandex.practicum.Exceptions;
 
-public class WordNullOrIncorrectLength extends RuntimeException {
+import java.io.PrintWriter;
+
+public class WordNullOrIncorrectLength extends Exception {
     public WordNullOrIncorrectLength(String message) {
         super(message);
     }
